@@ -1,11 +1,9 @@
 package hei.school.minou.mapper;
 
 import hei.school.minou.entity.Course;
-import hei.school.minou.entity.User;
+import hei.school.minou.entity.CourseAssignement;
 import hei.school.minou.repository.model.JCourse;
-import hei.school.minou.repository.model.JUser;
-import java.util.ArrayList;
-import java.util.List;
+import hei.school.minou.repository.model.JCourseAssignement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +12,7 @@ import org.springframework.stereotype.Component;
 public class CourseMapper {
 
   private final UserMapper userMapper;
+  private final GroupMapper groupMapper;
 
   public Course toDomain(JCourse jCourse) {
     if (jCourse == null) {
@@ -24,34 +23,36 @@ public class CourseMapper {
         .ref(jCourse.getRef())
         .title(jCourse.getTitle())
         .credit(jCourse.getCredit())
-        .teachers(toDomainTeachers(jCourse))
         .build();
-  }
-
-  private List<User> toDomainTeachers(JCourse jCourse) {
-    if (jCourse.getTeachers() == null) {
-      return null;
-    }
-    return jCourse.getTeachers().stream().map(userMapper::toDomain).toList();
   }
 
   public JCourse toJpa(Course course) {
     if (course == null) {
       return null;
     }
-    JCourse jCourse = new JCourse(course.id(), course.ref(), course.title(), course.credit(), null);
-    jCourse.setTeachers(toJpaTeachers(course));
-    return jCourse;
+    return new JCourse(course.id(), course.ref(), course.title(), course.credit());
   }
 
-  private List<JUser> toJpaTeachers(Course course) {
-    if (course.teachers() == null) {
+  public CourseAssignement toDomain(JCourseAssignement jCourseAssignement) {
+    if (jCourseAssignement == null) {
       return null;
     }
-    List<JUser> teachers = new ArrayList<>();
-    for (User teacher : course.teachers()) {
-      teachers.add(userMapper.toJpa(teacher));
+    return CourseAssignement.builder()
+        .id(jCourseAssignement.getId())
+        .course(toDomain(jCourseAssignement.getCourse()))
+        .teacher(userMapper.toDomain(jCourseAssignement.getTeacher()))
+        .group(groupMapper.toDomain(jCourseAssignement.getGroup()))
+        .build();
+  }
+
+  public JCourseAssignement toJpa(CourseAssignement courseAssignement) {
+    if (courseAssignement == null) {
+      return null;
     }
-    return teachers;
+    return new JCourseAssignement(
+        courseAssignement.id(),
+        toJpa(courseAssignement.course()),
+        userMapper.toJpa(courseAssignement.teacher()),
+        groupMapper.toJpa(courseAssignement.group()));
   }
 }

@@ -4,4 +4,4 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record Course(UUID id, String ref, String title, Integer credit) {}
+public record CourseAssignement(UUID id, Course course, User teacher, Group group) {}
