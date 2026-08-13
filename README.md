@@ -101,7 +101,7 @@ The project targets a minimum test coverage of **80%**.
 | JUnit | Unit and integration testing |
 | Mockito | Mocking |
 | Testcontainers | Integration testing |
-| Maven | Build and dependency management |
+| Gradle | Build and dependency management |
 | Git / GitHub | Version control |
 
 ---
