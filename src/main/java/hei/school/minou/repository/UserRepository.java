@@ -1,9 +1,9 @@
 package hei.school.minou.repository;
 
-import hei.school.minou.repository.model.JGroup;
+import hei.school.minou.repository.model.JUser;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface Group extends JpaRepository<JGroup, UUID> {}
+public interface UserRepository extends JpaRepository<JUser, UUID> {}

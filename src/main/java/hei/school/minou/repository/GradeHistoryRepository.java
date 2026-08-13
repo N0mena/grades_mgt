@@ -1,9 +1,9 @@
 package hei.school.minou.repository;
 
-import hei.school.minou.repository.model.JGrade;
+import hei.school.minou.repository.model.JGradeHistory;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface Grade extends JpaRepository<JGrade, UUID> {}
+public interface GradeHistoryRepository extends JpaRepository<JGradeHistory, UUID> {}
