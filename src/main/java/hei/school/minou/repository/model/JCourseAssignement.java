@@ -1,10 +1,14 @@
 package hei.school.minou.repository.model;
 
-import jakarta.persistence.*;
-import java.util.List;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -12,27 +16,20 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class JCourseAssignement {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID id;
+  @Id private UUID id;
 
-  private String ref;
-  private String title;
-  private Integer credit;
+  @ManyToOne
+  @JoinColumn(name = "course_id")
+  private JCourse course;
 
-  @ManyToMany
-  @JoinTable(
-      name = "course_teacher",
-      joinColumns = @JoinColumn(name = "course_id"),
-      inverseJoinColumns = @JoinColumn(name = "teacher_id"))
-  private List<JUser> teachers;
+  @ManyToOne
+  @JoinColumn(name = "teacher_id")
+  private JUser teacher;
 
-  @ManyToMany
-  @JoinTable(
-      name = "course_group",
-      joinColumns = @JoinColumn(name = "course_id"),
-      inverseJoinColumns = @JoinColumn(name = "group_id"))
-  private List<JGroup> groups;
+  @ManyToOne
+  @JoinColumn(name = "group_id")
+  private JGroup group;
 }
