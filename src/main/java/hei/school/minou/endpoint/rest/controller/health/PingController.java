@@ -1,6 +1,8 @@
 package hei.school.minou.endpoint.rest.controller.health;
 
 import hei.school.minou.PojaGenerated;
+import hei.school.minou.repository.DummyRepository;
+import hei.school.minou.repository.DummyUuidRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 public class PingController {
+
+  DummyRepository dummyRepository;
+  DummyUuidRepository dummyUuidRepository;
 
   public static final ResponseEntity<String> OK = new ResponseEntity<>("OK", HttpStatus.OK);
   public static final ResponseEntity<String> KO =
