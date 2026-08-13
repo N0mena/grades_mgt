@@ -1,3 +1,9 @@
 package hei.school.minou.repository;
 
-public interface GroupHistory {}
+import hei.school.minou.repository.model.JGradeHistory;
+import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface GroupHistory extends JpaRepository<JGradeHistory, UUID> {}
