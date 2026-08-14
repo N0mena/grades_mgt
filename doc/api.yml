@@ -1,0 +1,899 @@
+openapi: 3.0.3
+
+info:
+  title: Grade Management API
+  description: >
+    API for managing students, groups, courses, exams and grades.
+    Access rules: STUDENT can only see their own grades; TEACHER can only
+    modify grades they entered themselves; ADMIN has full access.
+  version: 1.0.0
+
+servers:
+  - url: /api
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: users
+  - name: courses
+  - name: groups
+  - name: course-assignments
+  - name: group-histories
+  - name: exams
+  - name: grades
+  - name: grade-histories
+  - name: promotion-eligibility
+
+paths:
+
+  # Users
+  /users:
+    post:
+      tags: [users]
+      summary: Create a user (ADMIN only)
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    get:
+      tags: [users]
+      summary: List all users (ADMIN only)
+      operationId: listUsers
+      parameters:
+        - $ref: '#/components/parameters/RoleFilter'
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /users/{userId}:
+    get:
+      tags: [users]
+      summary: Get a user (self or ADMIN)
+      operationId: getUser
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  #Courses
+  /courses:
+    post:
+      tags: [courses]
+      summary: Create a course (ADMIN only)
+      operationId: createCourse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseCreateRequest'
+      responses:
+        '201':
+          description: Course created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    get:
+      tags: [courses]
+      summary: List courses (any authenticated user)
+      operationId: listCourses
+      responses:
+        '200':
+          description: List of courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /courses/{courseId}:
+    get:
+      tags: [courses]
+      summary: Get a course
+      operationId: getCourse
+      parameters:
+        - $ref: '#/components/parameters/CourseId'
+      responses:
+        '200':
+          description: Course found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  #Groups
+  /groups:
+    post:
+      tags: [groups]
+      summary: Create a group (ADMIN only)
+      operationId: createGroup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupCreateRequest'
+      responses:
+        '201':
+          description: Group created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    get:
+      tags: [groups]
+      summary: List groups (any authenticated user)
+      operationId: listGroups
+      responses:
+        '200':
+          description: List of groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  #Course assignments
+  /course-assignments:
+    post:
+      tags: [course-assignments]
+      summary: Assign a teacher to a course for a group (ADMIN only)
+      operationId: createCourseAssignment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseAssignmentCreateRequest'
+      responses:
+        '201':
+          description: Assignment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseAssignment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    get:
+      tags: [course-assignments]
+      summary: List assignments (ADMIN, or TEACHER for their own)
+      operationId: listCourseAssignments
+      parameters:
+        - name: teacherId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of assignments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseAssignment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  #Group history
+  /group-histories:
+    post:
+      tags: [group-histories]
+      summary: Record a student's group change (ADMIN only)
+      operationId: createGroupHistory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupHistoryCreateRequest'
+      responses:
+        '201':
+          description: Group history entry created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupHistory'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /students/{studentId}/group-history:
+    get:
+      tags: [group-histories]
+      summary: Get a student's group history (self, TEACHER, or ADMIN)
+      operationId: getStudentGroupHistory
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+      responses:
+        '200':
+          description: Group history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupHistory'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  #Exams
+  /exams:
+    post:
+      tags: [exams]
+      summary: Create an exam (ADMIN, or TEACHER assigned to the course)
+      operationId: createExam
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamCreateRequest'
+      responses:
+        '201':
+          description: Exam created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exam'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    get:
+      tags: [exams]
+      summary: List exams (any authenticated user)
+      operationId: listExams
+      responses:
+        '200':
+          description: List of exams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exam'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /exams/{examId}:
+    get:
+      tags: [exams]
+      summary: Get an exam
+      operationId: getExam
+      parameters:
+        - $ref: '#/components/parameters/ExamId'
+      responses:
+        '200':
+          description: Exam found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exam'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  #Grades
+  /grades:
+    post:
+      tags: [grades]
+      summary: Enter a grade (ADMIN, or TEACHER assigned to the course)
+      operationId: createGrade
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GradeCreateRequest'
+      responses:
+        '201':
+          description: Grade created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Grade'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    get:
+      tags: [grades]
+      summary: List grades (ADMIN, or TEACHER for their own)
+      operationId: listGrades
+      responses:
+        '200':
+          description: List of grades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Grade'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /grades/{gradeId}:
+    put:
+      tags: [grades]
+      summary: >
+        Update a grade (ADMIN, or TEACHER if they entered it).
+        A "reason" is required and automatically triggers the creation
+        of a GradeHistory entry.
+      operationId: updateGrade
+      parameters:
+        - $ref: '#/components/parameters/GradeId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GradeUpdateRequest'
+      responses:
+        '200':
+          description: Grade updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Grade'
+        '400':
+          description: Invalid request (e.g. missing "reason")
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /students/{studentId}/grades:
+    get:
+      tags: [grades]
+      summary: Get a student's grades (self, TEACHER, or ADMIN)
+      operationId: getStudentGrades
+      parameters:
+        - $ref: '#/components/parameters/StudentId'
+        - name: courseId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of the student's grades
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Grade'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  #Grade history
+  /grades/{gradeId}/history:
+    get:
+      tags: [grade-histories]
+      summary: >
+        Get the modification history of a grade (the student concerned,
+        the teacher who entered the grade, or ADMIN)
+      operationId: getGradeHistory
+      parameters:
+        - $ref: '#/components/parameters/GradeId'
+      responses:
+        '200':
+          description: Grade history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GradeHistory'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  #Promotion eligibility
+  /groups/{groupId}/eligible-students:
+    get:
+      tags: [promotion-eligibility]
+      summary: >
+        List students in a group eligible for the promotion
+        (grade above 10 on every grade since they joined; ADMIN or TEACHER)
+      operationId: getEligibleStudents
+      parameters:
+        - $ref: '#/components/parameters/GroupId'
+      responses:
+        '200':
+          description: List of eligible students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EligibilityResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    StudentId:
+      name: studentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    CourseId:
+      name: courseId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ExamId:
+      name: examId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    GradeId:
+      name: gradeId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    GroupId:
+      name: groupId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RoleFilter:
+      name: role
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/Role'
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Authentication required or invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Insufficient role or ownership for this action
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+
+    Error:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+      required: [status, message]
+
+    Role:
+      type: string
+      enum: [STUDENT, TEACHER, ADMIN]
+
+    EntityRef:
+      type: object
+      description: Lightweight reference to an existing entity (by id only)
+      properties:
+        id:
+          type: string
+          format: uuid
+      required: [id]
+
+    #User
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/Role'
+      required: [id, firstName, lastName, email, role]
+
+    UserCreateRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+        role:
+          $ref: '#/components/schemas/Role'
+      required: [firstName, lastName, email, password, role]
+
+    #Course
+    Course:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        ref:
+          type: string
+        title:
+          type: string
+        credit:
+          type: integer
+      required: [id, ref, title, credit]
+
+    CourseCreateRequest:
+      type: object
+      properties:
+        ref:
+          type: string
+        title:
+          type: string
+        credit:
+          type: integer
+          minimum: 1
+      required: [ref, title, credit]
+
+    #Group
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        ref:
+          type: string
+      required: [id, ref]
+
+    GroupCreateRequest:
+      type: object
+      properties:
+        ref:
+          type: string
+      required: [ref]
+
+    #Course assignment
+    CourseAssignment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        course:
+          $ref: '#/components/schemas/Course'
+        teacher:
+          $ref: '#/components/schemas/User'
+        group:
+          $ref: '#/components/schemas/Group'
+      required: [id, course, teacher, group]
+
+    CourseAssignmentCreateRequest:
+      type: object
+      properties:
+        course:
+          $ref: '#/components/schemas/EntityRef'
+        teacher:
+          $ref: '#/components/schemas/EntityRef'
+        group:
+          $ref: '#/components/schemas/EntityRef'
+      required: [course, teacher, group]
+
+    #Group history
+    GroupHistory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        group:
+          $ref: '#/components/schemas/Group'
+        student:
+          $ref: '#/components/schemas/User'
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+          nullable: true
+      required: [id, group, student, startDate]
+
+    GroupHistoryCreateRequest:
+      type: object
+      properties:
+        group:
+          $ref: '#/components/schemas/EntityRef'
+        student:
+          $ref: '#/components/schemas/EntityRef'
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+          nullable: true
+      required: [group, student, startDate]
+
+    #Exam
+    Exam:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        examDate:
+          type: string
+          format: date-time
+        coefficient:
+          type: number
+          format: float
+        course:
+          $ref: '#/components/schemas/Course'
+        group:
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+      required: [id, examDate, coefficient, course, group]
+
+    ExamCreateRequest:
+      type: object
+      properties:
+        examDate:
+          type: string
+          format: date-time
+        coefficient:
+          type: number
+          format: float
+          minimum: 0
+        course:
+          $ref: '#/components/schemas/EntityRef'
+        group:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityRef'
+      required: [examDate, coefficient, course, group]
+
+    #Grade
+    Grade:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        value:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 20
+        student:
+          $ref: '#/components/schemas/User'
+        teacher:
+          $ref: '#/components/schemas/User'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        course:
+          $ref: '#/components/schemas/Course'
+        exam:
+          $ref: '#/components/schemas/Exam'
+      required: [id, value, student, teacher, createdAt, course, exam]
+
+    GradeCreateRequest:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 20
+        student:
+          $ref: '#/components/schemas/EntityRef'
+        course:
+          $ref: '#/components/schemas/EntityRef'
+        exam:
+          $ref: '#/components/schemas/EntityRef'
+      required: [value, student, course, exam]
+
+    GradeUpdateRequest:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 20
+        reason:
+          type: string
+          minLength: 1
+      required: [value, reason]
+
+    #Grade history
+    GradeHistory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        grade:
+          $ref: '#/components/schemas/Grade'
+        oldValue:
+          type: number
+          format: float
+        newValue:
+          type: number
+          format: float
+        modifiedAt:
+          type: string
+          format: date-time
+        reason:
+          type: string
+        modifiedBy:
+          $ref: '#/components/schemas/User'
+      required: [id, grade, oldValue, newValue, modifiedAt, reason, modifiedBy]
+
+    #Promotion eligibility
+    EligibilityResult:
+      type: object
+      description: Promotion eligibility result for a student
+      properties:
+        student:
+          $ref: '#/components/schemas/User'
+        eligible:
+          type: boolean
+        lowestGrade:
+          type: number
+          format: float
+          nullable: true
+          description: Lowest grade obtained since L1 (null if no grades yet)
+      required: [student, eligible]
