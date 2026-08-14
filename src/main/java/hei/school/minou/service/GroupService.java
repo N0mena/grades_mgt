@@ -2,9 +2,11 @@ package hei.school.minou.service;
 
 import hei.school.minou.entity.Group;
 import hei.school.minou.entity.GroupHistory;
+import hei.school.minou.entity.User;
 import hei.school.minou.exception.ResourceNotFoundException;
 import hei.school.minou.mapper.GroupHistoryMapper;
 import hei.school.minou.mapper.GroupMapper;
+import hei.school.minou.mapper.UserMapper;
 import hei.school.minou.repository.GroupHistoryRepository;
 import hei.school.minou.repository.GroupRepository;
 import hei.school.minou.repository.UserRepository;
@@ -27,6 +29,7 @@ public class GroupService {
   private final GroupHistoryRepository groupHistoryRepository;
   private final GroupMapper groupMapper;
   private final GroupHistoryMapper groupHistoryMapper;
+  private final UserMapper userMapper;
 
   public Group saveGroup(Group group) {
     return groupMapper.toDomain(groupRepository.save(groupMapper.toJpa(group)));
@@ -66,5 +69,11 @@ public class GroupService {
     openHistories.forEach(history -> history.setEndDate(LocalDateTime.now()));
     groupHistoryRepository.saveAll(openHistories);
     return assignStudent(studentId, newGroupId);
+  }
+
+  public List<User> getStudentsInGroup(UUID groupId) {
+    return groupHistoryRepository.findByGroup_IdAndEndDateIsNull(groupId).stream()
+        .map(history -> userMapper.toDomain(history.getStudent()))
+        .toList();
   }
 }
