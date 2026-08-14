@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PromotionController {
 
   private final PromotionService promotionService;
-
+  private final GraduateExcelGenerationService excelGenerationService;
 
   @GetMapping("/promotions")
   public List<Promotion> getPromotions() {
@@ -45,5 +45,21 @@ public class PromotionController {
     return promotionService.assignStudent(id, studentId);
   }
 
+  @GetMapping("/promotions/{id}/graduates")
+  public List<Graduate> getGraduates(@PathVariable UUID id) {
+    return promotionService.getGraduates(id);
+  }
 
+  @GetMapping("/promotions/{id}/graduates/export")
+  public ResponseEntity<byte[]> exportGraduates(@PathVariable UUID id) {
+    Promotion promotion = promotionService.getPromotionById(id);
+    List<Graduate> graduates = promotionService.getGraduates(id);
+    byte[] file = excelGenerationService.generate(promotion, graduates);
+    String ref = promotion.ref() != null ? promotion.ref() : promotion.id().toString();
+    return ResponseEntity.ok()
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"diplomes_" + ref + ".xlsx\"")
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+        .body(file);
+  }
 }
