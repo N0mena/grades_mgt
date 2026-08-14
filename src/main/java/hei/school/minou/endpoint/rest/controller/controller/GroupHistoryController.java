@@ -3,8 +3,6 @@ package hei.school.minou.endpoint.rest.controller.controller;
 import hei.school.minou.endpoint.rest.controller.dto.ChangeGroupRequest;
 import hei.school.minou.entity.GroupHistory;
 import hei.school.minou.entity.User;
-import hei.school.minou.entity.enums.Role;
-import hei.school.minou.exception.ForbiddenOperationException;
 import hei.school.minou.security.SecurityUtils;
 import hei.school.minou.service.GroupHistoryService;
 import hei.school.minou.service.GroupService;
