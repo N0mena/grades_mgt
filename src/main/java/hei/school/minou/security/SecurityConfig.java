@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -26,19 +25,30 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(csrf -> csrf.disable())
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/auth/login", "/ping", "/health/**",
-                            "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**")
+        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers(
+                        "/auth/login",
+                        "/ping",
+                        "/health/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**")
                     .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/exams").hasAnyRole("ADMIN", "TEACHER")
-                    .requestMatchers(HttpMethod.PATCH, "/exams/*/groups").hasAnyRole("ADMIN", "TEACHER")
-                    .requestMatchers(HttpMethod.POST, "/courses", "/users/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/exams")
+                    .hasAnyRole("ADMIN", "TEACHER")
+                    .requestMatchers(HttpMethod.PATCH, "/exams/*/groups")
+                    .hasAnyRole("ADMIN", "TEACHER")
+                    .requestMatchers(HttpMethod.POST, "/courses", "/users/**")
+                    .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.PUT, "/grades/**")
                     .hasAnyRole("ADMIN", "TEACHER")
-                    .requestMatchers(HttpMethod.DELETE, "/grades/**", "/grade-history/**").denyAll()
-                    .anyRequest().authenticated())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                    .requestMatchers(HttpMethod.DELETE, "/grades/**", "/grade-history/**")
+                    .denyAll()
+                    .anyRequest()
+                    .authenticated())
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
 
