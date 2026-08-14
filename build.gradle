@@ -157,6 +157,10 @@ implementation 'org.springframework.boot:spring-boot-starter-security'
 implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 testImplementation 'org.springframework.security:spring-security-test'
+implementation 'org.apache.poi:poi-ooxml:5.5.1'
+implementation 'org.apache.pdfbox:pdfbox:3.0.8'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+   implementation 'com.nimbusds:nimbus-jose-jwt:10.9.1'
 
 
 }
