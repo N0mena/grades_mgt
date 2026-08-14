@@ -80,5 +80,33 @@ public class PromotionControllerIT {
     verify(promotionService).assignStudent(promotionId, studentId);
   }
 
+  @Test
+  void should_return_graduates() {
+    UUID id = UUID.randomUUID();
+    Graduate graduate = mock(Graduate.class);
+    when(promotionService.getGraduates(id)).thenReturn(List.of(graduate));
 
+    List<Graduate> result = promotionController.getGraduates(id);
+
+    assertThat(result).containsExactly(graduate);
+    verify(promotionService).getGraduates(id);
+  }
+
+  @Test
+  void should_export_graduates_as_excel() {
+    UUID id = UUID.randomUUID();
+    Promotion promotion = Promotion.builder().id(id).ref("P2025").build();
+    byte[] bytes = new byte[] {1, 2, 3};
+    when(promotionService.getPromotionById(id)).thenReturn(promotion);
+    when(promotionService.getGraduates(id)).thenReturn(List.of());
+    when(excelGenerationService.generate(promotion, List.of())).thenReturn(bytes);
+
+    ResponseEntity<byte[]> response = promotionController.exportGraduates(id);
+
+    assertThat(response.getBody()).isEqualTo(bytes);
+    assertThat(response.getHeaders().getContentType())
+        .isEqualTo(MediaType.APPLICATION_OCTET_STREAM);
+    assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION))
+        .contains("diplomes_P2025.xlsx");
+  }
 }
