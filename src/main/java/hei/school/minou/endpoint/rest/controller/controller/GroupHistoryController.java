@@ -34,9 +34,6 @@ public class GroupHistoryController {
   public GroupHistory changeGroup(
       @PathVariable UUID studentId, @RequestBody ChangeGroupRequest request) {
     User actor = securityUtils.currentUser();
-    if (actor.role() == Role.STUDENT && !actor.id().equals(studentId)) {
-      throw new ForbiddenOperationException("A student can only change their own group");
-    }
     return groupService.moveStudent(studentId, request.newGroupId());
   }
 }
