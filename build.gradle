@@ -153,6 +153,10 @@ dependencies {
     testImplementation 'org.testcontainers:testcontainers-junit-jupiter:2.0.2'
     testImplementation 'org.junit-pioneer:junit-pioneer:2.2.0'
 
+implementation 'org.springframework.boot:spring-boot-starter-security'
+implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+testImplementation 'org.springframework.security:spring-security-test'
 
 
 }
