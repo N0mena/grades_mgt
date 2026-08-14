@@ -41,6 +41,13 @@ public class GradeService {
   private final GradeMapper gradeMapper;
   private final GradeHistoryMapper gradeHistoryMapper;
 
+  public List<Grade> getAllGrades(User viewer) {
+    if (viewer.role() != Role.ADMIN) {
+      throw new ForbiddenOperationException("Only an admin can view all grades");
+    }
+    return gradeRepository.findAll().stream().map(gradeMapper::toDomain).toList();
+  }
+
   public List<Grade> getGradesByStudent(UUID studentId, User viewer) {
     accessControlService.assertCanViewStudentGrades(viewer, studentId);
     List<JGrade> grades = gradeRepository.findByStudent_Id(studentId);
