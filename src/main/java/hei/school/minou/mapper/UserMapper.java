@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserMapper {
 
+  private final PromotionMapper promotionMapper;
+
   public User toDomain(JUser jUser) {
     if (jUser == null) {
       return null;
@@ -20,6 +22,7 @@ public class UserMapper {
         .role(jUser.getRole())
         .email(jUser.getEmail())
         .password(jUser.getPassword())
+        .promotion(promotionMapper.toDomain(jUser.getPromotion()))
         .build();
   }
 
@@ -28,6 +31,12 @@ public class UserMapper {
       return null;
     }
     return new JUser(
-        user.id(), user.firstName(), user.lastName(), user.role(), user.email(), user.password());
+        user.id(),
+        user.firstName(),
+        user.lastName(),
+        user.role(),
+        user.email(),
+        user.password(),
+        promotionMapper.toJpa(user.promotion()));
   }
 }

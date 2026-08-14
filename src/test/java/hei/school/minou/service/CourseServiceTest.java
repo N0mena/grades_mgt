@@ -165,6 +165,7 @@ class CourseServiceTest {
   }
 
   private static JUser jUser(UUID id) {
-    return new JUser(id, "A", "M", hei.school.minou.entity.enums.Role.TEACHER, "t@h.s", "enc");
+    return new JUser(
+        id, "A", "M", hei.school.minou.entity.enums.Role.TEACHER, "t@h.s", "enc", null);
   }
 }

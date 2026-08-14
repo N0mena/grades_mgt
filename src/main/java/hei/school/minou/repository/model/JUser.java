@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -28,4 +30,8 @@ public class JUser {
 
   private String email;
   private String password;
+
+  @ManyToOne
+  @JoinColumn(name = "promotion_id")
+  private JPromotion promotion;
 }

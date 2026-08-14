@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Diplômés - ' + ${promotion.name}">Diplômés</title>
+</head>
+<body>
+<h1 th:text="'Diplômés de la promotion ' + ${promotion.name}">Diplômés</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Prénom</th>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Moyenne générale</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="graduate : ${graduates}">
+        <td th:text="${graduate.firstName}">prénom</td>
+        <td th:text="${graduate.lastName}">nom</td>
+        <td th:text="${graduate.email}">email</td>
+        <td th:text="${graduate.overallAverage}">moyenne</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

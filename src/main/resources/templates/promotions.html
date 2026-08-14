@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Promotions</title>
+</head>
+<body>
+<h1>Promotions</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Référence</th>
+        <th>Nom</th>
+        <th>Date de début</th>
+        <th>Date de fin</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="promotion : ${promotions}">
+        <td th:text="${promotion.ref}">ref</td>
+        <td th:text="${promotion.name}">name</td>
+        <td th:text="${promotion.startDate}">start</td>
+        <td th:text="${promotion.endDate}">end</td>
+        <td><a th:href="@{/ui/promotions/{id}/graduates(id=${promotion.id})}">Diplômés</a></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

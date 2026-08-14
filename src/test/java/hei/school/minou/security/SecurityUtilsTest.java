@@ -226,7 +226,7 @@ class SecurityUtilsTest {
   }
 
   private static JUser jUser(UUID id, String email) {
-    return new JUser(id, "Alida", "Minou", Role.STUDENT, email, "encrypted");
+    return new JUser(id, "Alida", "Minou", Role.STUDENT, email, "encrypted", null);
   }
 
   private static JGrade newGrade() {

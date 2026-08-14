@@ -274,7 +274,7 @@ class GradeServiceTest {
   }
 
   private static JUser jUser(UUID id, String email) {
-    return new JUser(id, "A", "M", Role.STUDENT, email, "enc");
+    return new JUser(id, "A", "M", Role.STUDENT, email, "enc", null);
   }
 
   private static JGrade newJGrade() {

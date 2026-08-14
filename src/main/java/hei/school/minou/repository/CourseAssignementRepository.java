@@ -15,6 +15,8 @@ public interface CourseAssignementRepository extends JpaRepository<JCourseAssign
 
   List<JCourseAssignement> findByGroup_Id(UUID groupId);
 
+  List<JCourseAssignement> findByGroup_IdIn(List<UUID> groupIds);
+
   boolean existsByCourse_IdAndTeacher_IdAndGroup_Id(UUID courseId, UUID teacherId, UUID groupId);
 
   boolean existsByCourse_IdAndTeacher_Id(UUID courseId, UUID teacherId);
