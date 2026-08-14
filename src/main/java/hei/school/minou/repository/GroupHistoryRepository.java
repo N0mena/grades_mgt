@@ -12,4 +12,6 @@ public interface GroupHistoryRepository extends JpaRepository<JGroupHistory, UUI
   List<JGroupHistory> findByStudent_Id(UUID studentId);
 
   List<JGroupHistory> findByStudent_IdAndEndDateIsNull(UUID studentId);
+
+  List<JGroupHistory> findByGroup_IdAndEndDateIsNull(UUID groupId);
 }
