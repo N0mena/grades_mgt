@@ -9,6 +9,7 @@ import com.nimbusds.jwt.SignedJWT;
 import hei.school.minou.conf.JwtProperties;
 import hei.school.minou.entity.User;
 import hei.school.minou.entity.enums.Role;
+import hei.school.minou.exception.InvalidTokenException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.UUID;
@@ -44,7 +45,7 @@ public class JwtService {
     try {
       SignedJWT signedJWT = SignedJWT.parse(token);
       if (!signedJWT.verify(new MACVerifier(secretBytes()))) {
-        throw new RuntimeException("Invalid token");
+        throw new InvalidTokenException("Invalid token");
       }
       JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
 

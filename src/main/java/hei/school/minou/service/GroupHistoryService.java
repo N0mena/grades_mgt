@@ -3,6 +3,7 @@ package hei.school.minou.service;
 import hei.school.minou.entity.GroupHistory;
 import hei.school.minou.entity.User;
 import hei.school.minou.entity.enums.Role;
+import hei.school.minou.exception.ForbiddenOperationException;
 import hei.school.minou.mapper.GroupHistoryMapper;
 import hei.school.minou.repository.GroupHistoryRepository;
 import java.util.List;
@@ -19,10 +20,10 @@ public class GroupHistoryService {
 
   public List<GroupHistory> getHistoryByStudent(UUID studentId, User viewer) {
     if (viewer.role() == Role.STUDENT && !viewer.id().equals(studentId)) {
-      throw new RuntimeException("A student can only view their own group history");
+      throw new ForbiddenOperationException("A student can only view their own group history");
     }
     if (viewer.role() == Role.TEACHER) {
-      throw new RuntimeException("A teacher cannot access group history");
+      throw new ForbiddenOperationException("A teacher cannot access group history");
     }
     return groupHistoryRepository.findByStudent_Id(studentId).stream()
         .map(groupHistoryMapper::toDomain)

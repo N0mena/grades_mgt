@@ -2,6 +2,7 @@ package hei.school.minou.service;
 
 import hei.school.minou.entity.GradeHistory;
 import hei.school.minou.entity.User;
+import hei.school.minou.exception.ResourceNotFoundException;
 import hei.school.minou.mapper.GradeHistoryMapper;
 import hei.school.minou.repository.GradeHistoryRepository;
 import hei.school.minou.repository.GradeRepository;
@@ -25,7 +26,7 @@ public class GradeHistoryService {
     JGrade jGrade =
         gradeRepository
             .findById(gradeId)
-            .orElseThrow(() -> new RuntimeException("Grade not found: " + gradeId));
+            .orElseThrow(() -> new ResourceNotFoundException("Grade not found: " + gradeId));
     accessControlService.assertCanViewGrade(viewer, jGrade);
     return gradeHistoryRepository.findByGrade_Id(gradeId).stream()
         .map(gradeHistoryMapper::toDomain)

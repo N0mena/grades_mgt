@@ -3,6 +3,9 @@ package hei.school.minou.service;
 import hei.school.minou.entity.Grade;
 import hei.school.minou.entity.User;
 import hei.school.minou.entity.enums.Role;
+import hei.school.minou.exception.BadRequestException;
+import hei.school.minou.exception.ForbiddenOperationException;
+import hei.school.minou.exception.ResourceNotFoundException;
 import hei.school.minou.mapper.GradeHistoryMapper;
 import hei.school.minou.mapper.GradeMapper;
 import hei.school.minou.repository.CourseAssignementRepository;
@@ -53,11 +56,11 @@ public class GradeService {
 
   public List<Grade> getGradesByCourse(UUID courseId, User viewer) {
     if (viewer.role() == Role.STUDENT) {
-      throw new RuntimeException("A student cannot view all grades of a course");
+      throw new ForbiddenOperationException("A student cannot view all grades of a course");
     }
     if (viewer.role() == Role.TEACHER
         && !accessControlService.teacherTeachesCourse(viewer.id(), courseId)) {
-      throw new RuntimeException("A teacher can only view grades of their courses");
+      throw new ForbiddenOperationException("A teacher can only view grades of their courses");
     }
     return gradeRepository.findByCourse_Id(courseId).stream().map(gradeMapper::toDomain).toList();
   }
@@ -66,7 +69,7 @@ public class GradeService {
     JGrade jGrade =
         gradeRepository
             .findById(gradeId)
-            .orElseThrow(() -> new RuntimeException("Grade not found: " + gradeId));
+            .orElseThrow(() -> new ResourceNotFoundException("Grade not found: " + gradeId));
     accessControlService.assertCanViewGrade(viewer, jGrade);
     return gradeMapper.toDomain(jGrade);
   }
@@ -77,25 +80,26 @@ public class GradeService {
     JCourse course =
         courseRepository
             .findById(courseId)
-            .orElseThrow(() -> new RuntimeException("Course not found: " + courseId));
+            .orElseThrow(() -> new ResourceNotFoundException("Course not found: " + courseId));
     if (actor.role() != Role.ADMIN
         && !accessControlService.teacherTeachesCourse(actor.id(), courseId)) {
-      throw new RuntimeException("Only the teacher of the course or an admin can grade it");
+      throw new ForbiddenOperationException(
+          "Only the teacher of the course or an admin can grade it");
     }
     JUser student =
         userRepository
             .findById(studentId)
-            .orElseThrow(() -> new RuntimeException("Student not found: " + studentId));
+            .orElseThrow(() -> new ResourceNotFoundException("Student not found: " + studentId));
     JUser teacher =
         userRepository
             .findById(teacherId)
-            .orElseThrow(() -> new RuntimeException("Teacher not found: " + teacherId));
+            .orElseThrow(() -> new ResourceNotFoundException("Teacher not found: " + teacherId));
     JExam exam =
         examId == null
             ? null
             : examRepository
                 .findById(examId)
-                .orElseThrow(() -> new RuntimeException("Exam not found: " + examId));
+                .orElseThrow(() -> new ResourceNotFoundException("Exam not found: " + examId));
 
     JGrade jGrade =
         new JGrade(UUID.randomUUID(), value, student, teacher, LocalDateTime.now(), course, exam);
@@ -105,12 +109,12 @@ public class GradeService {
   @Transactional
   public Grade updateGrade(UUID gradeId, Float newValue, String reason, User actor) {
     if (reason == null || reason.isBlank()) {
-      throw new RuntimeException("A reason is required to modify a grade");
+      throw new BadRequestException("A reason is required to modify a grade");
     }
     JGrade jGrade =
         gradeRepository
             .findById(gradeId)
-            .orElseThrow(() -> new RuntimeException("Grade not found: " + gradeId));
+            .orElseThrow(() -> new ResourceNotFoundException("Grade not found: " + gradeId));
     accessControlService.assertCanModifyGrade(actor, jGrade);
 
     Float oldValue = jGrade.getValue();
@@ -120,7 +124,7 @@ public class GradeService {
     JUser modifiedBy =
         userRepository
             .findById(actor.id())
-            .orElseThrow(() -> new RuntimeException("User not found: " + actor.id()));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found: " + actor.id()));
     JGradeHistory history =
         new JGradeHistory(
             UUID.randomUUID(), saved, oldValue, newValue, LocalDateTime.now(), reason, modifiedBy);

@@ -2,6 +2,8 @@ package hei.school.minou.service;
 
 import hei.school.minou.entity.Course;
 import hei.school.minou.entity.CourseAssignement;
+import hei.school.minou.exception.BadRequestException;
+import hei.school.minou.exception.ResourceNotFoundException;
 import hei.school.minou.mapper.CourseMapper;
 import hei.school.minou.repository.CourseAssignementRepository;
 import hei.school.minou.repository.CourseRepository;
@@ -35,7 +37,7 @@ public class CourseService {
     JCourse jCourse =
         courseRepository
             .findById(courseId)
-            .orElseThrow(() -> new RuntimeException("Course not found: " + courseId));
+            .orElseThrow(() -> new ResourceNotFoundException("Course not found: " + courseId));
     return courseMapper.toDomain(jCourse);
   }
 
@@ -48,19 +50,19 @@ public class CourseService {
     JCourse course =
         courseRepository
             .findById(courseId)
-            .orElseThrow(() -> new RuntimeException("Course not found: " + courseId));
+            .orElseThrow(() -> new ResourceNotFoundException("Course not found: " + courseId));
     JUser teacher =
         userRepository
             .findById(teacherId)
-            .orElseThrow(() -> new RuntimeException("Teacher not found: " + teacherId));
+            .orElseThrow(() -> new ResourceNotFoundException("Teacher not found: " + teacherId));
     JGroup group =
         groupRepository
             .findById(groupId)
-            .orElseThrow(() -> new RuntimeException("Group not found: " + groupId));
+            .orElseThrow(() -> new ResourceNotFoundException("Group not found: " + groupId));
 
     if (courseAssignementRepository.existsByCourse_IdAndTeacher_IdAndGroup_Id(
         courseId, teacherId, groupId)) {
-      throw new RuntimeException("Course already assigned to this teacher and group");
+      throw new BadRequestException("Course already assigned to this teacher and group");
     }
 
     JCourseAssignement jAssignment =

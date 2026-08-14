@@ -1,6 +1,7 @@
 package hei.school.minou.service;
 
 import hei.school.minou.entity.Exam;
+import hei.school.minou.exception.ResourceNotFoundException;
 import hei.school.minou.mapper.ExamMapper;
 import hei.school.minou.repository.CourseRepository;
 import hei.school.minou.repository.ExamRepository;
@@ -30,7 +31,7 @@ public class ExamService {
     JCourse course =
         courseRepository
             .findById(courseId)
-            .orElseThrow(() -> new RuntimeException("Course not found: " + courseId));
+            .orElseThrow(() -> new ResourceNotFoundException("Course not found: " + courseId));
     JExam jExam = new JExam(UUID.randomUUID(), examDate, coefficient, course, null);
     jExam.setGroups(loadGroups(groupIds));
     return examMapper.toDomain(examRepository.save(jExam));
@@ -40,7 +41,7 @@ public class ExamService {
     JExam jExam =
         examRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Exam not found: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Exam not found: " + id));
     return examMapper.toDomain(jExam);
   }
 
@@ -57,7 +58,7 @@ public class ExamService {
     JExam jExam =
         examRepository
             .findById(examId)
-            .orElseThrow(() -> new RuntimeException("Exam not found: " + examId));
+            .orElseThrow(() -> new ResourceNotFoundException("Exam not found: " + examId));
     jExam.setGroups(loadGroups(groupIds));
     examRepository.save(jExam);
   }
@@ -71,7 +72,7 @@ public class ExamService {
             id ->
                 groupRepository
                     .findById(id)
-                    .orElseThrow(() -> new RuntimeException("Group not found: " + id)))
+                    .orElseThrow(() -> new ResourceNotFoundException("Group not found: " + id)))
         .toList();
   }
 }

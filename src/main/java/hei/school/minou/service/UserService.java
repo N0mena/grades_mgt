@@ -2,6 +2,7 @@ package hei.school.minou.service;
 
 import hei.school.minou.entity.User;
 import hei.school.minou.entity.enums.Role;
+import hei.school.minou.exception.ResourceNotFoundException;
 import hei.school.minou.mapper.UserMapper;
 import hei.school.minou.repository.UserRepository;
 import hei.school.minou.repository.model.JUser;
@@ -25,7 +26,7 @@ public class UserService {
     JUser jUser =
         userRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
     return userMapper.toDomain(jUser);
   }
 
@@ -33,7 +34,8 @@ public class UserService {
     JUser jUser =
         userRepository
             .findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+            .orElseThrow(
+                () -> new ResourceNotFoundException("User not found with email: " + email));
     return userMapper.toDomain(jUser);
   }
 

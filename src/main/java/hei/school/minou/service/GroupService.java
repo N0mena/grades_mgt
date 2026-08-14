@@ -2,6 +2,7 @@ package hei.school.minou.service;
 
 import hei.school.minou.entity.Group;
 import hei.school.minou.entity.GroupHistory;
+import hei.school.minou.exception.ResourceNotFoundException;
 import hei.school.minou.mapper.GroupHistoryMapper;
 import hei.school.minou.mapper.GroupMapper;
 import hei.school.minou.repository.GroupHistoryRepository;
@@ -35,7 +36,7 @@ public class GroupService {
     JGroup jGroup =
         groupRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Group not found: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Group not found: " + id));
     return groupMapper.toDomain(jGroup);
   }
 
@@ -48,11 +49,11 @@ public class GroupService {
     JUser student =
         userRepository
             .findById(studentId)
-            .orElseThrow(() -> new RuntimeException("Student not found: " + studentId));
+            .orElseThrow(() -> new ResourceNotFoundException("Student not found: " + studentId));
     JGroup group =
         groupRepository
             .findById(groupId)
-            .orElseThrow(() -> new RuntimeException("Group not found: " + groupId));
+            .orElseThrow(() -> new ResourceNotFoundException("Group not found: " + groupId));
     JGroupHistory jGroupHistory =
         new JGroupHistory(UUID.randomUUID(), group, student, LocalDateTime.now(), null);
     return groupHistoryMapper.toDomain(groupHistoryRepository.save(jGroupHistory));
