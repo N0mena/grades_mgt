@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface ExamRepository extends JpaRepository<JExam, UUID> {
 
   List<JExam> findByCourse_Id(UUID courseId);
+
+  List<JExam> findByGroups_IdIn(List<UUID> groupIds);
 }
