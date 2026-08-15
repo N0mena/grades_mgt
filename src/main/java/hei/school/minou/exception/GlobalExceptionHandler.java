@@ -48,8 +48,8 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ExceptionBody> handleGeneric(Exception e) {
-    String debugMessage = e.getClass().getSimpleName() + ": " + e.getMessage();
-    return respond(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", debugMessage);
+    return respond(
+        HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "An unexpected error occurred");
   }
 
   private ResponseEntity<ExceptionBody> respond(HttpStatus status, String type, String message) {
