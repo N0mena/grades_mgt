@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-public class  AuthController {
+public class AuthController {
 
   private final AuthService authService;
 
