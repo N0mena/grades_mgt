@@ -34,6 +34,9 @@ public class SecurityConfig {
             auth ->
                 auth.requestMatchers(
                         "/auth/login",
+                        "/login",
+                        "/ui/promotions",
+                        "/ui/promotions/**",
                         "/ping",
                         "/health/**",
                         "/swagger-ui/**",
