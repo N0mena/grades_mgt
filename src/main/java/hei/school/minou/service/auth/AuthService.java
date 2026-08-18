@@ -29,6 +29,6 @@ public class AuthService {
       throw new BadRequestException("Invalid email or password");
     }
     User user = userMapper.toDomain(jUser);
-    return LoginResponse.builder().token(jwtService.generateToken(user)).user(user).build();
+    return LoginResponse.success(jwtService.generateToken(user), user);
   }
 }

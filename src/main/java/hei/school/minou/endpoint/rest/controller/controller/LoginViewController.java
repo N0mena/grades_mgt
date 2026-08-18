@@ -1,9 +1,8 @@
 package hei.school.minou.endpoint.rest.controller.controller;
 
-import hei.school.minou.endpoint.rest.controller.dto.LoginRequest;
 import hei.school.minou.endpoint.rest.controller.dto.LoginResponse;
-import hei.school.minou.exception.BadRequestException;
-import hei.school.minou.service.auth.AuthService;
+import hei.school.minou.service.auth.LoginViewService;
+import hei.school.minou.service.url.UrlService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -17,7 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @AllArgsConstructor
 public class LoginViewController {
 
-  private final AuthService authService;
+  private final LoginViewService loginViewService;
+  private final UrlService urlService;
 
   @GetMapping("/login")
   public String showLoginPage() {
@@ -30,21 +30,17 @@ public class LoginViewController {
       @RequestParam String password,
       HttpServletResponse response,
       Model model) {
-    try {
-      LoginRequest request = LoginRequest.builder().email(email).password(password).build();
-      LoginResponse loginResponse = authService.login(request);
 
-      Cookie cookie = new Cookie("access_token", loginResponse.token());
-      cookie.setHttpOnly(true);
-      cookie.setPath("/");
-      cookie.setMaxAge(2 * 60 * 60);
-      response.addCookie(cookie);
+    LoginResponse result = loginViewService.login(email, password);
 
-      return "redirect:/ui/promotions";
-
-    } catch (BadRequestException e) {
-      model.addAttribute("error", "Email ou mot de passe invalide");
+    if (!result.success()) {
+      model.addAttribute("error", result.errorMessage());
       return "login";
     }
+
+    Cookie cookie = loginViewService.buildAuthCookie(result.token());
+    response.addCookie(cookie);
+
+    return urlService.buildRedirectUrl("/ui/promotions");
   }
 }
