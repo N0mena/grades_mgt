@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import hei.school.minou.endpoint.rest.controller.dto.LoginResponse;
 import hei.school.minou.service.auth.LoginViewService;
 import hei.school.minou.service.url.UrlService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,8 +35,14 @@ class LoginViewControllerIT {
 
   @Test
   void login_withValidCredentials_setsCookieAndRedirects() {
+    Cookie expectedCookie = new Cookie("access_token", "fake-jwt-token");
+    expectedCookie.setHttpOnly(true);
+    expectedCookie.setPath("/");
+    expectedCookie.setMaxAge(2 * 60 * 60);
+
     when(loginViewService.login("test.admin@hei.school", "Admin123!"))
         .thenReturn(LoginResponse.success("fake-jwt-token"));
+    when(loginViewService.buildAuthCookie("fake-jwt-token")).thenReturn(expectedCookie);
     when(urlService.buildRedirectUrl("/ui/promotions"))
         .thenReturn("redirect:https://fake-url.on.aws/ui/promotions");
 
