@@ -2,7 +2,7 @@ package hei.school.minou.endpoint.rest.controller.controller;
 
 import hei.school.minou.endpoint.rest.controller.dto.LoginResponse;
 import hei.school.minou.service.auth.LoginViewService;
-import hei.school.minou.service.url.UrlService;
+import hei.school.minou.service.auth.UrlService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;

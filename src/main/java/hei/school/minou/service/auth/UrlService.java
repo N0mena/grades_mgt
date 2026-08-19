@@ -1,4 +1,4 @@
-package hei.school.minou.service.url;
+package hei.school.minou.service.auth;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
