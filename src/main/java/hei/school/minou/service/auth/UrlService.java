@@ -8,7 +8,7 @@ public class UrlService {
 
   private final String baseUrl;
 
-  public UrlService(@Value("${app.base-url}") String baseUrl) {
+  public UrlService(@Value("${APP_BASE_URL}") String baseUrl) {
     this.baseUrl = baseUrl;
   }
 
