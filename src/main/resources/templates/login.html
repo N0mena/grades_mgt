@@ -7,52 +7,16 @@
 <body>
 <h1>Connexion</h1>
 
-<form id="loginForm">
+<form id="loginForm" method="POST" action="/login">
     <label>Email :</label>
-    <input type="email" id="email" required><br><br>
+    <input type="email" name="email" required><br><br>
 
     <label>Mot de passe :</label>
-    <input type="password" id="password" required><br><br>
+    <input type="password" name="password" required><br><br>
+
+    <p th:if="${error}" th:text="${error}" style="color:red;"></p>
 
     <button type="submit">Se connecter</button>
 </form>
-
-<p id="errorMessage" style="color:red;"></p>
-
-<script>
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const errorEl = document.getElementById('errorMessage');
-        errorEl.textContent = '';
-
-        try {
-            const response = await fetch('/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email, password: password })
-            });
-
-            if (!response.ok) {
-                const err = await response.json();
-                errorEl.textContent = err.message || 'Échec de connexion';
-                return;
-            }
-
-            const data = await response.json();
-
-            sessionStorage.setItem('jwt_token', data.token);
-            sessionStorage.setItem('user_email', data.user.email);
-            sessionStorage.setItem('user_role', data.user.role);
-
-            window.location.href = '/ui/promotions';
-
-        } catch (err) {
-            errorEl.textContent = 'Erreur réseau : ' + err.message;
-        }
-    });
-</script>
 </body>
 </html>
