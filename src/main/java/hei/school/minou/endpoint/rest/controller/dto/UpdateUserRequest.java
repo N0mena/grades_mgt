@@ -6,4 +6,9 @@ import lombok.Builder;
 
 @Builder
 public record UpdateUserRequest(
-    String firstName, String lastName, Role role, String email, String password, UUID promotionId) {}
+    String firstName,
+    String lastName,
+    Role role,
+    String email,
+    String password,
+    UUID promotionId) {}

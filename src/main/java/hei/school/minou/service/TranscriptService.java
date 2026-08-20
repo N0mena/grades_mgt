@@ -77,7 +77,9 @@ public class TranscriptService {
     for (Map.Entry<UUID, List<Grade>> entry : byCourse.entrySet()) {
       Course course = courses.get(entry.getKey());
       String title =
-          course.title() != null ? course.title() : (course.ref() != null ? course.ref() : "Course");
+          course.title() != null
+              ? course.title()
+              : (course.ref() != null ? course.ref() : "Course");
       averages.put(title, average(entry.getValue()));
     }
     return averages;

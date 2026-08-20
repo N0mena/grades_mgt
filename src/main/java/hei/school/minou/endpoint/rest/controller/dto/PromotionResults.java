@@ -7,10 +7,7 @@ import lombok.Builder;
 
 @Builder
 public record PromotionResults(
-    UUID promotionId,
-    String promotionRef,
-    String promotionName,
-    List<StudentYearResult> students) {
+    UUID promotionId, String promotionRef, String promotionName, List<StudentYearResult> students) {
 
   @Builder
   public record StudentYearResult(

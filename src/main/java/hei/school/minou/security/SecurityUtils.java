@@ -85,7 +85,8 @@ public class SecurityUtils {
 
   public void assertTeacherOrAdmin(User actor) {
     if (actor.role() != Role.ADMIN && actor.role() != Role.TEACHER) {
-      throw new ForbiddenOperationException("Only a teacher or an admin can perform this operation");
+      throw new ForbiddenOperationException(
+          "Only a teacher or an admin can perform this operation");
     }
   }
 
