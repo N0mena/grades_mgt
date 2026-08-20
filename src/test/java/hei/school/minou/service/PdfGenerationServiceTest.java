@@ -57,24 +57,24 @@ class PdfGenerationServiceTest {
     assertThat(extractText(output)).contains("Moyenne du cours : 12.00/20");
   }
 
-  //  @Test
-  //  void handlesNullCreditAsOne() throws Exception {
-  //    Course math =
-  //        Course.builder()
-  //            .id(UUID.randomUUID())
-  //            .ref("MATH")
-  //            .title("Mathématiques")
-  //            .credit(null)
-  //            .build();
-  //
-  //    File output = new File(tempDir, "null-credit.pdf");
-  //    pdfGenerationService.generateTranscript("Bob Martin", List.of(grade(16f, math, null)),
-  // output);
-  //
-  //    assertThat(extractText(output))
-  //        .contains("Mathématiques (crédit : 1)")
-  //        .contains("Moyenne générale (pondérée par crédit) : 16.00/20");
-  //  }
+    @Test
+    void handlesNullCreditAsOne() throws Exception {
+      Course math =
+          Course.builder()
+              .id(UUID.randomUUID())
+              .ref("MATH")
+              .title("Mathématiques")
+              .credit(null)
+              .build();
+
+      File output = new File(tempDir, "null-credit.pdf");
+      pdfGenerationService.generateTranscript("Bob Martin", List.of(grade(16f, math, null)),
+   output);
+
+      assertThat(extractText(output))
+          .contains("Mathématiques (crédit : 1)")
+          .contains("Moyenne générale (pondérée par crédit) : 16.00/20");
+    }
 
   @Test
   void handlesNoGrades() throws Exception {
