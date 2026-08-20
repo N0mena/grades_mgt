@@ -33,9 +33,7 @@ public class GroupService {
 
   public Group saveGroup(Group group) {
     Group toSave =
-        group.id() != null
-            ? group
-            : Group.builder().id(UUID.randomUUID()).ref(group.ref()).build();
+        group.id() != null ? group : Group.builder().id(UUID.randomUUID()).ref(group.ref()).build();
     return groupMapper.toDomain(groupRepository.save(groupMapper.toJpa(toSave)));
   }
 

@@ -158,8 +158,7 @@ public class CourseService {
     courseAssignementRepository.findByCourse_Id(courseId).stream()
         .filter(
             assignment ->
-                viewer.role() == Role.ADMIN
-                    || assignment.getTeacher().getId().equals(viewer.id()))
+                viewer.role() == Role.ADMIN || assignment.getTeacher().getId().equals(viewer.id()))
         .map(assignment -> groupMapper.toDomain(assignment.getGroup()))
         .forEach(group -> groups.put(group.id(), group));
     return new ArrayList<>(groups.values());
@@ -171,8 +170,7 @@ public class CourseService {
     courseAssignementRepository.findByCourse_Id(courseId).stream()
         .filter(
             assignment ->
-                viewer.role() == Role.ADMIN
-                    || assignment.getTeacher().getId().equals(viewer.id()))
+                viewer.role() == Role.ADMIN || assignment.getTeacher().getId().equals(viewer.id()))
         .map(assignment -> assignment.getGroup().getId())
         .forEach(groupIds::add);
     Map<UUID, User> students = new LinkedHashMap<>();
