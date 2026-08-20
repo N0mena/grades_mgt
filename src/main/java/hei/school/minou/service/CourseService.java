@@ -45,7 +45,7 @@ public class CourseService {
   private final UserMapper userMapper;
   private final SecurityUtils securityUtils;
 
-  public Course saveCourse(Course course) {
+    public Course saveCourse(Course course) {
     Course toSave =
         course.id() != null
             ? course
