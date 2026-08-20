@@ -34,11 +34,7 @@ class CourseServiceTest {
   private CourseAssignementRepository courseAssignementRepository;
   private UserRepository userRepository;
   private GroupRepository groupRepository;
-  private GroupHistoryRepository groupHistoryRepository;
   private CourseMapper courseMapper;
-  private GroupMapper groupMapper;
-  private UserMapper userMapper;
-  private SecurityUtils securityUtils;
   private CourseService courseService;
 
   @BeforeEach
@@ -47,11 +43,11 @@ class CourseServiceTest {
     courseAssignementRepository = mock(CourseAssignementRepository.class);
     userRepository = mock(UserRepository.class);
     groupRepository = mock(GroupRepository.class);
-    groupHistoryRepository = mock(GroupHistoryRepository.class);
+    GroupHistoryRepository groupHistoryRepository = mock(GroupHistoryRepository.class);
     courseMapper = mock(CourseMapper.class);
-    groupMapper = mock(GroupMapper.class);
-    userMapper = mock(UserMapper.class);
-    securityUtils = mock(SecurityUtils.class);
+    GroupMapper groupMapper = mock(GroupMapper.class);
+    UserMapper userMapper = mock(UserMapper.class);
+    SecurityUtils securityUtils = mock(SecurityUtils.class);
     courseService =
         new CourseService(
             courseRepository,
