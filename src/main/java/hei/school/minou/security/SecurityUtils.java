@@ -76,4 +76,37 @@ public class SecurityUtils {
     }
     throw new ForbiddenOperationException("Only a teacher or an admin can modify grades");
   }
+
+  public void assertAdmin(User actor) {
+    if (actor.role() != Role.ADMIN) {
+      throw new ForbiddenOperationException("Only an admin can perform this operation");
+    }
+  }
+
+  public void assertTeacherOrAdmin(User actor) {
+    if (actor.role() != Role.ADMIN && actor.role() != Role.TEACHER) {
+      throw new ForbiddenOperationException(
+          "Only a teacher or an admin can perform this operation");
+    }
+  }
+
+  public void assertCanAccessCourse(User viewer, UUID courseId) {
+    if (viewer.role() == Role.ADMIN) {
+      return;
+    }
+    if (viewer.role() == Role.TEACHER && teacherTeachesCourse(viewer.id(), courseId)) {
+      return;
+    }
+    throw new ForbiddenOperationException("You cannot access this course");
+  }
+
+  public void assertStudentSelfOrAdmin(User actor, UUID studentId) {
+    if (actor.role() == Role.ADMIN) {
+      return;
+    }
+    if (actor.role() == Role.STUDENT && actor.id().equals(studentId)) {
+      return;
+    }
+    throw new ForbiddenOperationException("A student can only access their own data");
+  }
 }

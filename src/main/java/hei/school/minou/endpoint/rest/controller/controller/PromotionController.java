@@ -1,6 +1,7 @@
 package hei.school.minou.endpoint.rest.controller.controller;
 
 import hei.school.minou.endpoint.rest.controller.dto.Graduate;
+import hei.school.minou.endpoint.rest.controller.dto.PromotionResults;
 import hei.school.minou.entity.Promotion;
 import hei.school.minou.entity.User;
 import hei.school.minou.service.GraduateExcelGenerationService;
@@ -48,6 +49,11 @@ public class PromotionController {
   @GetMapping("/promotions/{id}/graduates")
   public List<Graduate> getGraduates(@PathVariable UUID id) {
     return promotionService.getGraduates(id);
+  }
+
+  @GetMapping("/promotions/{id}/results")
+  public PromotionResults getResults(@PathVariable UUID id) {
+    return promotionService.getResults(id);
   }
 
   @GetMapping("/promotions/{id}/graduates/export")
