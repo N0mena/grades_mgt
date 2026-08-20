@@ -56,7 +56,6 @@ public class PdfGenerationService {
     }
   }
 
-
   private static List<CourseAggregate> aggregateByCourse(List<Grade> grades) {
     Map<UUID, Course> courses = new LinkedHashMap<>();
     Map<UUID, List<Grade>> byCourse = new LinkedHashMap<>();
@@ -148,7 +147,6 @@ public class PdfGenerationService {
     private final PDDocument document;
     private PDPageContentStream contentStream;
     private float y = START_Y;
-
 
     PdfWriter(PDDocument document) throws IOException {
       this.document = document;
