@@ -340,14 +340,14 @@ class PromotionServiceTest {
       JCourse course = course(courseId, "Maths", 3);
       stubPromotionLookup(promotionId);
       when(userRepository.findByRoleAndPromotion_Id(Role.STUDENT, promotionId))
-              .thenReturn(List.of(student));
+          .thenReturn(List.of(student));
       when(groupHistoryRepository.findByStudent_Id(student.getId()))
-              .thenReturn(List.of(history(student.getId(), groupId)));
+          .thenReturn(List.of(history(student.getId(), groupId)));
       when(courseAssignementRepository.findByGroup_IdIn(List.of(groupId)))
-              .thenReturn(List.of(assignment(course, groupId)));
+          .thenReturn(List.of(assignment(course, groupId)));
       when(examRepository.findByGroups_IdIn(List.of(groupId))).thenReturn(List.of());
       when(gradeRepository.findByStudent_IdAndCourse_Id(student.getId(), courseId))
-              .thenReturn(List.of());
+          .thenReturn(List.of());
 
       List<Graduate> graduates = promotionService.getGraduates(promotionId);
 
