@@ -331,6 +331,29 @@ class PromotionServiceTest {
       assertThat(graduates).extracting(Graduate::firstName).containsExactly("Bob", "Zoe", "Anna");
     }
 
+    @Test
+    void studentWithAssignedCourseButNoGrades_isNotGraduate() {
+      UUID promotionId = UUID.randomUUID();
+      UUID groupId = UUID.randomUUID();
+      UUID courseId = UUID.randomUUID();
+      JUser student = student(UUID.randomUUID(), "Sans", "Notes");
+      JCourse course = course(courseId, "Maths", 3);
+      stubPromotionLookup(promotionId);
+      when(userRepository.findByRoleAndPromotion_Id(Role.STUDENT, promotionId))
+          .thenReturn(List.of(student));
+      when(groupHistoryRepository.findByStudent_Id(student.getId()))
+          .thenReturn(List.of(history(student.getId(), groupId)));
+      when(courseAssignementRepository.findByGroup_IdIn(List.of(groupId)))
+          .thenReturn(List.of(assignment(course, groupId)));
+      when(examRepository.findByGroups_IdIn(List.of(groupId))).thenReturn(List.of());
+      when(gradeRepository.findByStudent_IdAndCourse_Id(student.getId(), courseId))
+          .thenReturn(List.of());
+
+      List<Graduate> graduates = promotionService.getGraduates(promotionId);
+
+      assertThat(graduates).isEmpty();
+    }
+
     private void stubPromotionLookup(UUID promotionId) {
       JPromotion jPromotion = promotion(promotionId);
       when(promotionRepository.findById(promotionId)).thenReturn(Optional.of(jPromotion));
