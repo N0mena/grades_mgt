@@ -13,14 +13,14 @@ import hei.school.minou.entity.CourseAssignement;
 import hei.school.minou.exception.BadRequestException;
 import hei.school.minou.exception.ResourceNotFoundException;
 import hei.school.minou.mapper.CourseMapper;
-import hei.school.minou.repository.CourseAssignementRepository;
-import hei.school.minou.repository.CourseRepository;
-import hei.school.minou.repository.GroupRepository;
-import hei.school.minou.repository.UserRepository;
+import hei.school.minou.mapper.GroupMapper;
+import hei.school.minou.mapper.UserMapper;
+import hei.school.minou.repository.*;
 import hei.school.minou.repository.model.JCourse;
 import hei.school.minou.repository.model.JCourseAssignement;
 import hei.school.minou.repository.model.JGroup;
 import hei.school.minou.repository.model.JUser;
+import hei.school.minou.security.SecurityUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,7 +34,11 @@ class CourseServiceTest {
   private CourseAssignementRepository courseAssignementRepository;
   private UserRepository userRepository;
   private GroupRepository groupRepository;
+  private GroupHistoryRepository groupHistoryRepository;
   private CourseMapper courseMapper;
+  private GroupMapper groupMapper;
+  private UserMapper userMapper;
+  private SecurityUtils securityUtils;
   private CourseService courseService;
 
   @BeforeEach
@@ -43,14 +47,22 @@ class CourseServiceTest {
     courseAssignementRepository = mock(CourseAssignementRepository.class);
     userRepository = mock(UserRepository.class);
     groupRepository = mock(GroupRepository.class);
+    groupHistoryRepository = mock(GroupHistoryRepository.class);
     courseMapper = mock(CourseMapper.class);
+    groupMapper = mock(GroupMapper.class);
+    userMapper = mock(UserMapper.class);
+    securityUtils = mock(SecurityUtils.class);
     courseService =
         new CourseService(
             courseRepository,
             courseAssignementRepository,
             userRepository,
             groupRepository,
-            courseMapper);
+            groupHistoryRepository,
+            courseMapper,
+            groupMapper,
+            userMapper,
+            securityUtils);
   }
 
   @Nested
