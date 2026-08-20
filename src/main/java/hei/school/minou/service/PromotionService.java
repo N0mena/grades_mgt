@@ -1,6 +1,7 @@
 package hei.school.minou.service;
 
 import hei.school.minou.endpoint.rest.controller.dto.Graduate;
+import hei.school.minou.endpoint.rest.controller.dto.PromotionResults;
 import hei.school.minou.entity.Promotion;
 import hei.school.minou.entity.User;
 import hei.school.minou.entity.enums.Role;
@@ -19,6 +20,7 @@ import hei.school.minou.repository.model.JExam;
 import hei.school.minou.repository.model.JGrade;
 import hei.school.minou.repository.model.JPromotion;
 import hei.school.minou.repository.model.JUser;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -46,7 +48,17 @@ public class PromotionService {
   private final UserMapper userMapper;
 
   public Promotion savePromotion(Promotion promotion) {
-    return promotionMapper.toDomain(promotionRepository.save(promotionMapper.toJpa(promotion)));
+    Promotion toSave =
+        promotion.id() != null
+            ? promotion
+            : Promotion.builder()
+                .id(UUID.randomUUID())
+                .ref(promotion.ref())
+                .name(promotion.name())
+                .startDate(promotion.startDate())
+                .endDate(promotion.endDate())
+                .build();
+    return promotionMapper.toDomain(promotionRepository.save(promotionMapper.toJpa(toSave)));
   }
 
   public Promotion getPromotionById(UUID id) {
@@ -83,6 +95,130 @@ public class PromotionService {
         .filter(Objects::nonNull)
         .sorted(Comparator.comparing(Graduate::lastName).thenComparing(Graduate::firstName))
         .toList();
+  }
+
+  public PromotionResults getResults(UUID promotionId) {
+    Promotion promotion = getPromotionById(promotionId);
+    List<PromotionResults.StudentYearResult> students =
+        userRepository.findByRoleAndPromotion_Id(Role.STUDENT, promotionId).stream()
+            .map(student -> toStudentYearResult(student, promotion))
+            .sorted(
+                Comparator.comparing(PromotionResults.StudentYearResult::lastName)
+                    .thenComparing(PromotionResults.StudentYearResult::firstName))
+            .toList();
+    return PromotionResults.builder()
+        .promotionId(promotion.id())
+        .promotionRef(promotion.ref())
+        .promotionName(promotion.name())
+        .students(students)
+        .build();
+  }
+
+  private PromotionResults.StudentYearResult toStudentYearResult(
+      JUser student, Promotion promotion) {
+    List<JGrade> grades = gradeRepository.findByStudent_Id(student.getId());
+    Map<String, Float> courseAverages = courseAveragesFromGrades(grades);
+    Float overall = overallFromCourseAverages(student.getId(), courseAverages);
+    List<PromotionResults.YearResult> years = yearResults(grades, promotion.startDate());
+    return PromotionResults.StudentYearResult.builder()
+        .studentId(student.getId())
+        .firstName(student.getFirstName())
+        .lastName(student.getLastName())
+        .email(student.getEmail())
+        .overallAverage(overall)
+        .courseAverages(courseAverages)
+        .years(years)
+        .build();
+  }
+
+  private List<PromotionResults.YearResult> yearResults(
+      List<JGrade> grades, LocalDateTime promotionStart) {
+    LocalDateTime start =
+        promotionStart != null
+            ? promotionStart
+            : grades.stream()
+                .map(JGrade::getCreatedAt)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(LocalDateTime.now());
+    List<PromotionResults.YearResult> years = new ArrayList<>();
+    for (int year = 1; year <= 3; year++) {
+      LocalDateTime yearStart = start.plusYears(year - 1L);
+      LocalDateTime yearEnd = start.plusYears(year);
+      List<JGrade> yearGrades =
+          grades.stream()
+              .filter(grade -> grade.getCreatedAt() != null)
+              .filter(
+                  grade ->
+                      !grade.getCreatedAt().isBefore(yearStart)
+                          && grade.getCreatedAt().isBefore(yearEnd))
+              .toList();
+      Map<String, Float> averages = courseAveragesFromGrades(yearGrades);
+      Float average =
+          averages.isEmpty()
+              ? null
+              : (float)
+                  averages.values().stream().mapToDouble(Float::doubleValue).average().orElse(0);
+      years.add(
+          PromotionResults.YearResult.builder()
+              .year(year)
+              .average(average)
+              .courseAverages(averages)
+              .build());
+    }
+    return years;
+  }
+
+  private Map<String, Float> courseAveragesFromGrades(List<JGrade> grades) {
+    Map<UUID, List<JGrade>> byCourse = new LinkedHashMap<>();
+    Map<UUID, JCourse> courses = new LinkedHashMap<>();
+    for (JGrade grade : grades) {
+      if (grade.getCourse() == null) {
+        continue;
+      }
+      byCourse.computeIfAbsent(grade.getCourse().getId(), unused -> new ArrayList<>()).add(grade);
+      courses.putIfAbsent(grade.getCourse().getId(), grade.getCourse());
+    }
+    Map<String, Float> averages = new LinkedHashMap<>();
+    for (Map.Entry<UUID, List<JGrade>> entry : byCourse.entrySet()) {
+      averages.put(courseTitle(courses.get(entry.getKey())), averageOfGrades(entry.getValue()));
+    }
+    return averages;
+  }
+
+  private Float overallFromCourseAverages(UUID studentId, Map<String, Float> courseAverages) {
+    if (courseAverages.isEmpty()) {
+      return null;
+    }
+    List<JCourse> courses = coursesOfCursus(studentId);
+    if (courses.isEmpty()) {
+      return (float)
+          courseAverages.values().stream().mapToDouble(Float::doubleValue).average().orElse(0);
+    }
+    float weightedSum = 0;
+    int totalCredit = 0;
+    for (JCourse course : courses) {
+      Float average = courseAverages.get(courseTitle(course));
+      if (average == null) {
+        continue;
+      }
+      int credit = course.getCredit() != null ? course.getCredit() : 1;
+      weightedSum += average * credit;
+      totalCredit += credit;
+    }
+    return totalCredit == 0 ? null : weightedSum / totalCredit;
+  }
+
+  private float averageOfGrades(List<JGrade> grades) {
+    float weightedSum = 0;
+    float totalCoefficient = 0;
+    for (JGrade grade : grades) {
+      float value = grade.getValue() != null ? grade.getValue() : 0f;
+      float coefficient = coefficientOf(grade);
+      weightedSum += value * coefficient;
+      totalCoefficient += coefficient;
+    }
+    return totalCoefficient == 0 ? 0 : weightedSum / totalCoefficient;
   }
 
   private Graduation computeGraduation(JUser student) {

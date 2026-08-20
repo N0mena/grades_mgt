@@ -20,4 +20,6 @@ public interface CourseAssignementRepository extends JpaRepository<JCourseAssign
   boolean existsByCourse_IdAndTeacher_IdAndGroup_Id(UUID courseId, UUID teacherId, UUID groupId);
 
   boolean existsByCourse_IdAndTeacher_Id(UUID courseId, UUID teacherId);
+
+  void deleteByCourse_Id(UUID courseId);
 }
