@@ -123,7 +123,10 @@ public class PdfGenerationService {
 
   private record CourseAggregate(Course course, List<Grade> grades, float average) {
     Integer credit() {
-      return course != null ? course.credit() : 1;
+      if (course == null) {
+        return 1;
+      }
+      return course.credit() != null ? course.credit() : 1;
     }
 
     String title() {
