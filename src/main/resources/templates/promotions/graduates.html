@@ -6,6 +6,9 @@
 </head>
 <body>
 <h1 th:text="'Diplômés de la promotion ' + ${promotion.name}">Diplômés</h1>
+<a th:href="@{/promotions/{id}/graduates/export(id=${promotion.id})}">
+    <button>Télécharger le fichier Excel</button>
+</a>
 <table border="1">
     <thead>
     <tr>
