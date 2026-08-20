@@ -32,7 +32,19 @@ public class GroupService {
   private final UserMapper userMapper;
 
   public Group saveGroup(Group group) {
-    return groupMapper.toDomain(groupRepository.save(groupMapper.toJpa(group)));
+    Group toSave =
+        group.id() != null
+            ? group
+            : Group.builder().id(UUID.randomUUID()).ref(group.ref()).build();
+    return groupMapper.toDomain(groupRepository.save(groupMapper.toJpa(toSave)));
+  }
+
+  public Group getCurrentGroup(UUID studentId) {
+    return groupHistoryRepository.findByStudent_IdAndEndDateIsNull(studentId).stream()
+        .findFirst()
+        .map(history -> groupMapper.toDomain(history.getGroup()))
+        .orElseThrow(
+            () -> new ResourceNotFoundException("No current group for student: " + studentId));
   }
 
   public Group getGroupById(UUID id) {
