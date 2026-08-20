@@ -47,11 +47,11 @@ class CourseServiceTest {
     courseAssignementRepository = mock(CourseAssignementRepository.class);
     userRepository = mock(UserRepository.class);
     groupRepository = mock(GroupRepository.class);
-    groupHistoryRepository = mock(GroupHistoryRepository.class);
+    GroupHistoryRepository groupHistoryRepository = mock(GroupHistoryRepository.class);
     courseMapper = mock(CourseMapper.class);
-    groupMapper = mock(GroupMapper.class);
-    userMapper = mock(UserMapper.class);
-    securityUtils = mock(SecurityUtils.class);
+    GroupMapper groupMapper = mock(GroupMapper.class);
+    UserMapper userMapper = mock(UserMapper.class);
+    SecurityUtils securityUtils = mock(SecurityUtils.class);
     courseService =
         new CourseService(
             courseRepository,
