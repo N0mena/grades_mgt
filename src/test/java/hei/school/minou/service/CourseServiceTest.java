@@ -34,7 +34,11 @@ class CourseServiceTest {
   private CourseAssignementRepository courseAssignementRepository;
   private UserRepository userRepository;
   private GroupRepository groupRepository;
+  private GroupHistoryRepository groupHistoryRepository;
   private CourseMapper courseMapper;
+  private GroupMapper groupMapper;
+  private UserMapper userMapper;
+  private SecurityUtils securityUtils;
   private CourseService courseService;
 
   @BeforeEach
